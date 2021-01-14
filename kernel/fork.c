@@ -138,7 +138,7 @@ void __init fork_init(unsigned long mempages)
 /**
  * 为子进程获取进程描述符。
  */
-static struct task_struct *dup_task_struct(struct task_struct *orig)
+static struct task_struct *dup_task_struc(struct task_struct *orig)
 {
 	struct task_struct *tsk;
 	struct thread_info *ti;
@@ -325,6 +325,7 @@ static inline void mm_free_pgd(struct mm_struct * mm)
 #define free_mm(mm)	(kmem_cache_free(mm_cachep, (mm)))
 
 #include <linux/init_task.h>
+#include <io.h>
 
 static struct mm_struct * mm_init(struct mm_struct * mm)
 {
@@ -875,7 +876,7 @@ asmlinkage long sys_set_tid_address(int __user *tidptr)
  */
 /**
  * 创建进程描述符以及子进程执行所需要的所有其他数据结构
- * 它的参数与do_fork相同。外加子进程的PID。
+ * do_fork()会调用此方法, 并额外传入pid参数
  */
 static task_t *copy_process(unsigned long clone_flags,
 				 unsigned long stack_start,
@@ -916,7 +917,7 @@ static task_t *copy_process(unsigned long clone_flags,
 	 */
 	/**
 	 * CLONE_SIGHAND被设置，但是CLONE_VM没有设置。
-	 * (共享信号处理程序的轻量级进程也必须共享内存描述符)
+	 * (共享信号处理程序的轻量级进程(线程)也必须共享内存描述符)
 	 */
 	if ((clone_flags & CLONE_SIGHAND) && !(clone_flags & CLONE_VM))
 		return ERR_PTR(-EINVAL);
@@ -1414,7 +1415,7 @@ long do_fork(unsigned long clone_flags,
 		/**
 		 * 没有设置CLONE_STOPPED,就调用wake_up_new_task
 		 * 它调整父进程和子进程的调度参数.
-		 * 如果父子进程运行在同一个CPU上,并且不能共享同一组页表(CLONE_VM标志被清0).那么,就把子进程插入父进程运行队列.
+		 * 如果父子进程运行在同一个CPU上,并且不能共享同一组页表(CLONE_VM标志被清0, 非线程).那么,就把子进程插入父进程运行队列.
 		 * 并且子进程插在父进程之前.这样做的目的是:如果子进程在创建之后执行新程序,就可以避免写时复制机制执行不必要时页面复制.
 		 * 否则,如果运行在不同的CPU上,或者父子进程共享同一组页表.就把子进程插入父进程运行队列的队尾.
 		 */

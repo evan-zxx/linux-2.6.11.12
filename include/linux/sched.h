@@ -164,6 +164,9 @@ extern unsigned long nr_iowait(void);
 #define TASK_RUNNING		0
 /**
  * 可中断的等待状态。
+ * 处于等待队伍中，等待资源有效时唤醒（比方等待键盘输入、socket连接、信号等等），但能够被中断唤醒.
+ * 普通情况下，进程列表中的绝大多数进程都处于TASK_INTERRUPTIBLE状态. 毕竟皇帝仅仅有一个（单个CPU时），后宫佳丽几千；
+ * 假设不是绝大多数进程都在睡眠，CPU又怎么响应得过来.
  */
 #define TASK_INTERRUPTIBLE	1
 /**

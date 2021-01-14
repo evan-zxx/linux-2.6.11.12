@@ -1529,6 +1529,7 @@ retry:
 		}
 		remove_wait_queue(&ep->wq, &wait);
 
+		// rdlist检测到事件触发后, 将当前task设置为running状态
 		set_current_state(TASK_RUNNING);
 	}
 
