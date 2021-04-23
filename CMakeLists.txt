@@ -787,6 +787,17 @@ FILE(GLOB_RECURSE LOCAL_CPP_FILES "./*.c")
 
 
 add_definitions("-D__KERNEL__")
+add_definitions("-D__ASSEMBLY__")
+add_definitions("-DWANT_PAGE_VIRTUAL")
+add_definitions("-DHASHED_PAGE_VIRTUAL")
+add_definitions("-DCONFIG_HIGHMEM")
+add_definitions("-DCONFIG_NET_DIVERT")
+
+
+add_definitions("-DVERSION=2")
+add_definitions("-DPATCHLEVEL=6")
+add_definitions("-DSUBLEVEL=11")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
 
 set(CMAKE_C_STANDARD 90)

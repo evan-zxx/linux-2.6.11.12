@@ -252,7 +252,8 @@ struct skb_shared_info {
 
 /**
  * 接收或发送数据包的元信息.
- * 这个结构被不同的网络层（MAC 或者其他二层链路协议，三层的 IP，四层的 TCP 或UDP等）使用，并且其中的成员变量在结构从一层向另一层传递时改变
+ * 这个结构被不同的网络层（MAC 或者其他二层链路协议，三层的 IP，四层的 TCP 或UDP等）使用
+ * 并且其中的成员变量在结构从一层向另一层传递时改变
  */
 struct sk_buff {
 	/* These two members must be first. */

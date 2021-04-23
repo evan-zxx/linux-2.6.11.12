@@ -6,6 +6,7 @@
 /* PAGE_SHIFT determines the page size */
 #define PAGE_SHIFT	12
 #ifdef __ASSEMBLY__
+// page size 4096
 #define PAGE_SIZE	(0x1 << PAGE_SHIFT)
 #else
 #define PAGE_SIZE	(1UL << PAGE_SHIFT)

@@ -385,7 +385,8 @@ struct net_device
 	 */
 	unsigned long		base_addr;	/* device I/O address	*/
 	/**
-	 * 设备中断号。它可以被多个设备共享。设备驱动调用request_irq来分配这个值，并调用free_irq来释放它。
+	 * 设备中断号。它可以被多个设备共享。
+	 * 设备驱动调用request_irq来分配这个值，并调用free_irq来释放它。
 	 */
 	unsigned int		irq;		/* device IRQ number	*/
 
@@ -395,6 +396,7 @@ struct net_device
 	 */
 	/**
 	 * 接口的端口类型。
+	 * 指定在多端口设备上使用哪个端口.
 	 */
 	unsigned char		if_port;	/* Selectable AUI, TP,..*/
 	/**
@@ -404,10 +406,11 @@ struct net_device
 
 	/**
 	 * 包含一组被网络队列子系统使用的标记
+	 * 设备状态.
 	 */
 	unsigned long		state;
 	/**
-	 * 指向全局链表中的下一个节点
+	 * 指向全局链表中的下一个设备指针.
 	 */
 	struct net_device	*next;
 	
@@ -496,6 +499,7 @@ struct net_device
                                                          */
 	/**
 	 * 最大传输单元，它表示设备可以处理帧的最大长度
+	 * 以太网是1500字节
 	 */
 	unsigned		mtu;	/* interface MTU value		*/
 	/**
@@ -528,6 +532,7 @@ struct net_device
 	unsigned char		broadcast[MAX_ADDR_LEN];	/* hw bcast add	*/
 	/**
 	 * dev_addr是设备的链路层地址，不要把它和IP地址或者L3地址混淆了。
+	 * 硬件(mac)地址
 	 */
 	unsigned char		dev_addr[MAX_ADDR_LEN];	/* hw address	*/
 	/**

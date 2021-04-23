@@ -891,6 +891,8 @@ struct task_struct {
 
 	/**
 	 * mm:指向内存区描述符的指针
+	 * 包含虚拟内存区域链表, 页表, 以及其他内存管理信息.
+	 * 多个进程可以共享该结构, linux就是这样实现线程的.
 	 */
 	struct mm_struct *mm, *active_mm;
 

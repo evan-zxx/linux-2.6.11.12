@@ -87,7 +87,9 @@ struct vm_area_struct {
 	 */
 	pgprot_t vm_page_prot;		/* Access permissions of this VMA. */
 	/**
-	 * 线性区的标志。
+	 * 线性区的标志
+	 * 驱动程序感兴趣的是VM_IO: 将VMA设置为一个内存映射IO区域, 阻止系统将该区域包含在进程的核心转储中.
+	 *               和VM_RESERVED: 阻止将该VMA交换出去.
 	 */
 	unsigned long vm_flags;		/* Flags, listed below. */
 
@@ -358,6 +360,8 @@ typedef unsigned long page_flags_t;
  * it to keep track of whatever it is we are using the page for at the
  * moment. Note that we have no way to track which tasks are using
  * a page.
+ *
+ * 对于系统中的每个物理页, 都有一个page结构与之对应 --> 页框
  */
 struct page {
 	/**
@@ -374,6 +378,7 @@ struct page {
 	 */
 	atomic_t _count;		/* Usage count, see below. */
 	/**
+	 * 页表是用来将虚拟地址 --> 物理地址
 	 * 页框中的页表项数目（没有则为-1）
 	 *		-1:		表示没有页表项引用该页框。
 	 *		0:		表明页是非共享的。
@@ -413,6 +418,9 @@ struct page {
 	 * 作为不同的含义被几种内核成分使用。
 	 * 在页磁盘映象或匿名区中表示存放在页框中的数据的位置。
 	 * 或者它存放在一个换出页标志符。
+	 *
+	 * 如果页框不在高端内存中(PG_highmem标志为0)，则线性地址总是存在的。
+	 * 并且通过计算页框下标，然后将其转换成物理地址，最后根据物理地址得到线性地址。
 	 */
 	pgoff_t index;			/* Our offset within mapping. */
 	/**
@@ -433,7 +441,9 @@ struct page {
 	 */
 #if defined(WANT_PAGE_VIRTUAL)
 	/**
-	 * 如果进行了内存映射，就是虚拟地址。对存在高端内存的系统来说有意义。
+	 * 如果进行了内存映射，则指向页的内核虚拟地址。对存在高端内存的系统来说有意义。
+	 * 如果未被映射, 则为null, 低端内存页总是被映射, 高端内存页不常被映射
+	 * 只有页的内核虚拟地址不容易被计算时, 该字段才被编译(x86), 否则直接使用内核逻辑地址来引用物理页(arm)
 	 */
 	void *virtual;			/* Kernel virtual address (NULL if
 					   not kmapped, ie. highmem) */
@@ -636,6 +646,7 @@ static inline void *lowmem_page_address(struct page *page)
 #endif
 
 #if defined(HASHED_PAGE_VIRTUAL)
+// 如果地址存在, 则返回该页中映射的内核虚拟地址.
 void *page_address(struct page *page);
 void set_page_address(struct page *page, void *virtual);
 void page_address_init(void);
@@ -806,6 +817,8 @@ extern int make_pages_present(unsigned long addr, unsigned long end);
 extern int access_process_vm(struct task_struct *tsk, unsigned long addr, void *buf, int len, int write);
 void install_arg_page(struct vm_area_struct *, struct page *, unsigned long);
 
+// tsk: 指向执行io任务的指针  mm: 指向描述被映射地址空间的管理结构
+// 调用成功, 调用者拥有一个指向用户空间缓冲区的页数组, 将被锁在内存中.
 int get_user_pages(struct task_struct *tsk, struct mm_struct *mm, unsigned long start,
 		int len, int write, int force, struct page **pages, struct vm_area_struct **vmas);
 
